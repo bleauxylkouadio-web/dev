@@ -1,0 +1,91 @@
+# =====================================================================
+#  pubspec.yaml : carte d'identité du projet MARCHÉ_CONNECT
+#  (nom, version, dépendances, images). Après chaque modification :
+#  lancer « flutter pub get » (VS Code le fait tout seul à l'enregistrement).
+# =====================================================================
+
+# Nom technique du paquet Dart (minuscules et « _ » uniquement).
+name: marche_connect
+description: "Plateforme reliant commerçants et clients des marchés d'Abidjan"
+
+# « none » = ce projet ne sera jamais publié sur pub.dev (c'est une app, pas une librairie).
+publish_to: 'none'
+
+# Version de l'application : 1.0.0 = version visible (V1 du cahier des charges),
+# +1 = numéro de build, à augmenter à chaque envoi sur le Play Store / App Store.
+version: 1.0.0+1
+
+# Version minimale du langage Dart exigée.
+environment:
+  sdk: ^3.13.7
+
+# ---------------------------------------------------------------------
+#  Dépendances utilisées par l'application
+#  « ^18.1.4 » = accepte 18.1.4 et les mises à jour compatibles (< 19.0.0).
+# ---------------------------------------------------------------------
+dependencies:
+  # Le framework Flutter lui-même.
+  flutter:
+    sdk: flutter
+
+  # Traductions des composants Flutter en français (calendrier, boutons
+  # « Annuler »/« OK »…). Exigence UX-02 : application en français.
+  flutter_localizations:
+    sdk: flutter
+
+  # Outils web de Flutter : adresses sans « # » pour la PWA
+  # (ex. /etal/e-1 au lieu de /#/etal/e-1), utile pour les QR imprimés.
+  flutter_web_plugins:
+    sdk: flutter
+
+  # Icônes style iPhone (fourni par défaut, utile pour les commerçants sous iOS).
+  cupertino_icons: ^1.0.8
+
+  # NAVIGATION : donne une adresse à chaque écran (/vitrine/etal-12, /ticket/482913…).
+  # Indispensable pour la PWA : le QR de l'étal ouvre directement une URL.
+  go_router: ^18.1.4
+
+  # ÉTAT DE L'APPLICATION : partage des données entre écrans
+  # (contenu du panier, utilisateur connecté, liste des commandes).
+  flutter_riverpod: ^3.5.0
+
+  # AFFICHER un QR code : ticket de commande, QR plastifié de l'étal (MAR-05).
+  qr_flutter: ^4.1.0
+
+  # SCANNER un QR code avec la caméra : le livreur valide la remise.
+  mobile_scanner: ^7.5.0
+
+  # FORMATS français : prix « 1 500 F », dates « 17 nov. 2026 à 14:30 » (UX-05).
+  intl: ^0.20.3
+
+  # STOCKAGE LOCAL rapide : catalogue consultable hors ligne (UX-03)
+  # et commande gardée en cas de coupure réseau (MAR-04).
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+
+  # OUVRIR UN LIEN SYSTÈME : bouton « Appeler le commerçant » (tel:),
+  # plus tard WhatsApp et itinéraire (ACH-01).
+  url_launcher: ^6.3.3
+
+# ---------------------------------------------------------------------
+#  Dépendances de développement (non incluses dans l'app finale)
+# ---------------------------------------------------------------------
+dev_dependencies:
+  # Outils pour écrire des tests automatiques.
+  flutter_test:
+    sdk: flutter
+  # Règles de bonne écriture du code (avertissements dans VS Code).
+  flutter_lints: ^6.0.0
+
+# ---------------------------------------------------------------------
+#  Configuration Flutter
+# ---------------------------------------------------------------------
+flutter:
+  # Active les icônes Material (panier, téléphone, camion de livraison…).
+  uses-material-design: true
+
+  # Dossiers d'images inclus dans l'application.
+  # Le « / » final = tout le contenu du dossier est inclus.
+  assets:
+    - assets/images/
+    - assets/icons/

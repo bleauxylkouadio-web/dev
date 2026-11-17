@@ -1,0 +1,38 @@
+{
+    "name": "MARCHÉ_CONNECT",
+    "short_name": "MarchéConnect",
+    "description": "Commandez auprès des étals des marchés d'Abidjan : prix affichés, Mobile Money, livraison ou retrait.",
+    "lang": "fr-CI",
+    "start_url": "/etals",
+    "scope": "/",
+    "display": "standalone",
+    "background_color": "#F7F7F5",
+    "theme_color": "#0B6E4F",
+    "orientation": "portrait-primary",
+    "categories": ["shopping", "food"],
+    "prefer_related_applications": false,
+    "icons": [
+        {
+            "src": "icons/Icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/Icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/Icon-maskable-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "icons/Icon-maskable-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ]
+}

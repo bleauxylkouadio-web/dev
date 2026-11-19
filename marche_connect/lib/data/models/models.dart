@@ -11,6 +11,7 @@ export 'commande.dart';
 export 'enums.dart';
 export 'etal.dart';
 export 'litige.dart';
+export 'position_livreur.dart';
 export 'produit.dart';
 export 'statistiques.dart';
 export 'utilisateur.dart';

@@ -11,7 +11,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 
 import 'core/router/app_router.dart';
+import 'core/theme/app_colors.dart';
 import 'core/theme/app_theme.dart';
+import 'core/widgets/identite.dart';
 import 'data/local/stockage_local.dart';
 import 'data/repositories/providers.dart';
 
@@ -70,6 +72,27 @@ class MarcheConnectApp extends ConsumerWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
+
+      // ---------- IDENTITÉ : bande du drapeau en haut de TOUS les écrans ----------
+      // `builder` enveloppe chaque écran. On place :
+      //   1. la zone de la barre d'état du téléphone (heure, batterie) en vert ;
+      //   2. la bande orange | blanc | vert ;
+      //   3. l'écran, sans la marge du haut (déjà occupée par 1 et 2).
+      builder: (context, ecran) {
+        final margeHaut = MediaQuery.paddingOf(context).top;
+        return ColoredBox(
+          color: AppColors.fond,
+          child: Column(
+            children: [
+              Container(height: margeHaut, color: AppColors.primaireFonce),
+              const BandeDrapeau(),
+              Expanded(
+                child: MediaQuery.removePadding(context: context, removeTop: true, child: ecran!),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

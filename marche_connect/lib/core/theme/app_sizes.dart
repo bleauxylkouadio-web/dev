@@ -6,6 +6,8 @@
 //  cohérente et on peut tout ajuster depuis un seul endroit.
 // =====================================================================
 
+import 'package:flutter/painting.dart';
+
 /// Espacements (en « pixels logiques », l'unité de Flutter, indépendante
 /// de la résolution de l'écran).
 abstract final class AppSpacing {
@@ -27,14 +29,27 @@ abstract final class AppSpacing {
 
 /// Arrondis des coins.
 abstract final class AppRadius {
-  /// Badges « Disponible / Épuisé ».
-  static const double petit = 8;
+  /// Photos, petits éléments.
+  static const double petit = 10;
 
-  /// Boutons, champs de saisie, cartes.
-  static const double moyen = 12;
+  /// Boutons et champs de saisie.
+  static const double moyen = 14;
 
-  /// Feuilles qui montent du bas de l'écran (panier rapide…).
-  static const double grand = 20;
+  /// Cartes.
+  static const double carte = 16;
+
+  /// Fenêtres et feuilles qui montent du bas de l'écran.
+  static const double grand = 24;
+
+  /// Pilule (badges « Disponible / Épuisé », puces).
+  static const double pilule = 999;
+}
+
+/// Ombres douces : les cartes « flottent » légèrement au-dessus du fond.
+abstract final class AppOmbres {
+  static const List<BoxShadow> carte = [
+    BoxShadow(color: Color(0x0F15191E), blurRadius: 12, offset: Offset(0, 4)),
+  ];
 }
 
 /// Tailles minimales des éléments touchables.
@@ -44,7 +59,7 @@ abstract final class AppRadius {
 /// parfois avec les mains occupées.
 abstract final class AppSizes {
   /// Hauteur des boutons principaux (« Commander », « Payer 1 500 F »).
-  static const double hauteurBouton = 56;
+  static const double hauteurBouton = 54;
 
   /// Taille minimale de toute zone touchable (icône, case à cocher…).
   static const double zoneTouchMin = 48;

@@ -40,12 +40,9 @@ class MesCommandesScreen extends ConsumerWidget {
               onPressed: () => ref.read(sessionProvider.notifier).deconnecter(),
             ),
           ],
+          // Couleurs des onglets : thème (texte blanc, trait orange).
           bottom: TabBar(
-            labelColor: Colors.white,
-            unselectedLabelColor: Colors.white70,
-            indicatorColor: Colors.white,
             indicatorWeight: 4,
-            labelStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
             tabs: [
               Tab(text: _titreOnglet('En cours', commandes.value, terminees: false)),
               Tab(text: _titreOnglet('Terminées', commandes.value, terminees: true)),

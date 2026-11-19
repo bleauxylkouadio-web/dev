@@ -163,10 +163,11 @@ class _InterrupteurDisponibilite extends StatelessWidget {
         Switch(
           value: disponible,
           onChanged: (_) => onBasculer(),
-          activeThumbColor: Colors.white,
-          activeTrackColor: AppColors.succes,
-          inactiveThumbColor: Colors.white,
-          inactiveTrackColor: AppColors.erreur,
+          // Rouge quand épuisé : le commerçant voit l'état d'un coup d'œil.
+          // (Vert quand disponible : couleur du thème.)
+          trackColor: WidgetStateProperty.resolveWith(
+            (etats) => etats.contains(WidgetState.selected) ? AppColors.succes : AppColors.erreur,
+          ),
         ),
         Text(
           disponible ? 'Dispo' : 'Épuisé',

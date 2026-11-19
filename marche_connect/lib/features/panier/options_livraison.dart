@@ -33,6 +33,7 @@ class OptionsLivraison {
     this.choixHeure = ChoixHeure.desQuePossible,
     this.heurePerso,
     this.adresse = '',
+    this.commune,
     this.memeCommune = true,
   });
 
@@ -56,7 +57,12 @@ class OptionsLivraison {
   /// Livraison : adresse ou point de repère (« derrière la pharmacie… »).
   final String adresse;
 
-  /// Livraison : le client est-il dans la même commune que l'étal ?
+  /// Livraison : commune où livrer. Obligatoire : elle fixe les frais et
+  /// permet aux livreurs de regrouper les livraisons d'une même commune.
+  final Commune? commune;
+
+  /// Livraison : la commune choisie est-elle celle de l'étal ?
+  /// (calculé au moment du choix, voir choisirCommune)
   final bool memeCommune;
 
   /// Frais à ajouter au total (0 pour un retrait).
@@ -67,9 +73,9 @@ class OptionsLivraison {
 
   /// Message d'erreur si le choix est incomplet, sinon null.
   String? get erreur {
-    if (mode == ModeLivraison.livraison && adresse.trim().length < 5) {
-      return 'Indiquez votre adresse ou un point de repère.';
-    }
+    if (mode != ModeLivraison.livraison) return null;
+    if (commune == null) return 'Choisissez la commune de livraison.';
+    if (adresse.trim().length < 5) return 'Indiquez votre adresse ou un point de repère.';
     return null;
   }
 
@@ -78,6 +84,7 @@ class OptionsLivraison {
     ChoixHeure? choixHeure,
     DateTime? heurePerso,
     String? adresse,
+    Commune? commune,
     bool? memeCommune,
   }) {
     return OptionsLivraison(
@@ -85,6 +92,7 @@ class OptionsLivraison {
       choixHeure: choixHeure ?? this.choixHeure,
       heurePerso: heurePerso ?? this.heurePerso,
       adresse: adresse ?? this.adresse,
+      commune: commune ?? this.commune,
       memeCommune: memeCommune ?? this.memeCommune,
     );
   }
@@ -105,8 +113,10 @@ class OptionsLivraisonNotifier extends Notifier<OptionsLivraison> {
 
   void saisirAdresse(String adresse) => state = state.copyWith(adresse: adresse);
 
-  void choisirZone({required bool memeCommune}) =>
-      state = state.copyWith(memeCommune: memeCommune);
+  /// Commune de livraison. `communeEtal` sert à calculer les frais :
+  /// même commune que l'étal → 500 F, autre commune → 1 000 F.
+  void choisirCommune(Commune commune, {required Commune? communeEtal}) =>
+      state = state.copyWith(commune: commune, memeCommune: commune == communeEtal);
 
   /// Après une commande : on repart des valeurs par défaut.
   void reinitialiser() => state = const OptionsLivraison();

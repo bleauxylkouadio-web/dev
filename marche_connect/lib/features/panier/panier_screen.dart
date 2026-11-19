@@ -17,6 +17,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/router/routes.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_theme.dart';
 import '../../core/theme/app_sizes.dart';
 import '../../core/utils/formatters.dart';
 import '../../core/widgets/widgets.dart';
@@ -107,10 +108,7 @@ class _PanierScreenState extends ConsumerState<PanierScreen> {
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.m),
           child: FilledButton(
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.accent,
-              foregroundColor: AppColors.surAccent,
-            ),
+            style: AppTheme.boutonOrange,
             onPressed: _continuer,
             child: Text('Continuer · ${formaterPrix(total)}'),
           ),
@@ -145,7 +143,7 @@ class _PanierScreenState extends ConsumerState<PanierScreen> {
 
           // ---------- Retrait ou livraison ----------
           ChoixLivraison(
-            communeEtal: etal?.commune.libelle ?? "l'étal",
+            communeEtal: etal?.commune,
             afficherErreur: _essaiDeValidation,
           ),
           const SizedBox(height: AppSpacing.m),

@@ -43,6 +43,9 @@ class MockDatabase {
   late final List<Commande> commandes;
   late final List<Litige> litiges;
 
+  /// Dernière position du livreur, par commande (suivi en direct).
+  final Map<String, PositionLivreur> positions = {};
+
   // ===================================================================
   //  SIMULATION DU RÉSEAU
   //  Vrai = « coupure » : tous les appels échouent, comme sans connexion.
@@ -253,6 +256,7 @@ class MockDatabase {
         modeLivraison: ModeLivraison.livraison,
         fraisLivraison: 500,
         adresseLivraison: 'Cocody Angré, près de la pharmacie du 8e tranche',
+        communeLivraison: Commune.cocody,
         moyenPaiement: MoyenPaiement.wave,
         statut: StatutCommande.prete,
         statutPaiement: StatutPaiement.paye,
@@ -297,12 +301,80 @@ class MockDatabase {
         modeLivraison: ModeLivraison.livraison,
         fraisLivraison: 1000,
         adresseLivraison: 'Cocody Riviera 2',
+        communeLivraison: Commune.cocody,
         moyenPaiement: MoyenPaiement.orangeMoney,
         statut: StatutCommande.livree,
         statutPaiement: StatutPaiement.paye,
         creeLe: now.subtract(const Duration(days: 3)),
         confirmeeLe: now.subtract(const Duration(days: 3)),
         livreurId: 'u-3',
+      ),
+
+      // ---- Commandes DISPONIBLES (prêtes, sans livreur) ----
+      // Deux à livrer à Cocody, comme la course d'Ibrahim (c-1) :
+      // il peut les prendre sur le même trajet.
+      Commande(
+        id: 'c-4',
+        numero: '615208',
+        etalId: 'e-2',
+        nomEtal: 'Chez Tantie Awa',
+        nomClient: 'Fatou Bamba',
+        telephoneClient: '0711223344',
+        lignes: const [
+          LigneCommande(produitId: 'p-201', nomProduit: 'Attiéké poisson', prixUnitaire: 1500,
+              unite: UniteVente.portion, quantite: 2),
+        ],
+        modeLivraison: ModeLivraison.livraison,
+        fraisLivraison: 500,
+        adresseLivraison: 'Riviera 3, résidence Les Palmiers',
+        communeLivraison: Commune.cocody,
+        moyenPaiement: MoyenPaiement.wave,
+        statut: StatutCommande.prete,
+        statutPaiement: StatutPaiement.paye,
+        creeLe: ilYa(30),
+        confirmeeLe: ilYa(28),
+      ),
+      Commande(
+        id: 'c-5',
+        numero: '904731',
+        etalId: 'e-1',
+        nomEtal: 'Étal de Mariam',
+        nomClient: 'Serge Kouamé',
+        telephoneClient: '0544556677',
+        lignes: const [
+          LigneCommande(produitId: 'p-101', nomProduit: 'Tomates', prixUnitaire: 500,
+              unite: UniteVente.kg, quantite: 3),
+        ],
+        modeLivraison: ModeLivraison.livraison,
+        fraisLivraison: 1000,
+        adresseLivraison: '2 Plateaux Vallons, rue des Jardins',
+        communeLivraison: Commune.cocody,
+        moyenPaiement: MoyenPaiement.aLaLivraison,
+        statut: StatutCommande.prete,
+        creeLe: ilYa(20),
+        confirmeeLe: ilYa(18),
+      ),
+      // Une à livrer à Abobo : un livreur de Cocody ne la voit pas.
+      Commande(
+        id: 'c-6',
+        numero: '337460',
+        etalId: 'e-4',
+        nomEtal: 'Vivriers Koffi',
+        nomClient: 'Aminata Coulibaly',
+        telephoneClient: '0122334455',
+        lignes: const [
+          LigneCommande(produitId: 'p-401', nomProduit: 'Igname', prixUnitaire: 600,
+              unite: UniteVente.kg, quantite: 5),
+        ],
+        modeLivraison: ModeLivraison.livraison,
+        fraisLivraison: 500,
+        adresseLivraison: 'Abobo Gare, derrière la mairie',
+        communeLivraison: Commune.abobo,
+        moyenPaiement: MoyenPaiement.mtnMomo,
+        statut: StatutCommande.prete,
+        statutPaiement: StatutPaiement.paye,
+        creeLe: ilYa(15),
+        confirmeeLe: ilYa(12),
       ),
     ];
   }

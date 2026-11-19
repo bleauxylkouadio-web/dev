@@ -5,7 +5,7 @@
 //
 //   Retrait   → heure : [Dès que possible] [Dans 1 h] [Dans 2 h] [Autre…]
 //   Livraison → adresse / point de repère
-//               zone : (●) Même commune 500 F   ( ) Autre commune 1 000 F
+//               commune : (●) Adjamé 500 F  ( ) Cocody 1 000 F …
 //               Délai estimé : 30 à 60 min
 // =====================================================================
 
@@ -21,8 +21,8 @@ import '../options_livraison.dart';
 class ChoixLivraison extends ConsumerWidget {
   const ChoixLivraison({super.key, required this.communeEtal, this.afficherErreur = false});
 
-  /// Commune de l'étal, pour le libellé « Même commune (Adjamé) ».
-  final String communeEtal;
+  /// Commune de l'étal : livrer dans cette commune coûte 500 F, ailleurs 1 000 F.
+  final Commune? communeEtal;
 
   /// Vrai après un appui sur « Continuer » avec un choix incomplet.
   final bool afficherErreur;
@@ -156,14 +156,38 @@ class _ChoixAdresse extends StatelessWidget {
 
   final OptionsLivraison options;
   final OptionsLivraisonNotifier actions;
-  final String communeEtal;
+  final Commune? communeEtal;
   final bool afficherErreur;
 
   @override
   Widget build(BuildContext context) {
+    // Messages rouges seulement après un essai de validation.
+    final erreurCommune = afficherErreur && options.commune == null;
+    final erreurAdresse = afficherErreur && options.adresse.trim().length < 5;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        // ---------- Commune (fixe les frais) ----------
+        Text('Commune de livraison', style: Theme.of(context).textTheme.titleSmall),
+        const SizedBox(height: AppSpacing.s),
+        for (final c in Commune.values) ...[
+          _OptionZone(
+            titre: c == communeEtal ? '${c.libelle} (commune de l\'étal)' : c.libelle,
+            prix: c == communeEtal ? TarifsLivraison.memeCommune : TarifsLivraison.autreCommune,
+            choisi: options.commune == c,
+            onTap: () => actions.choisirCommune(c, communeEtal: communeEtal),
+          ),
+          const SizedBox(height: AppSpacing.s),
+        ],
+        if (erreurCommune)
+          const Padding(
+            padding: EdgeInsets.only(bottom: AppSpacing.s),
+            child: Text('Choisissez la commune de livraison.', style: TextStyle(color: AppColors.erreur)),
+          ),
+        const SizedBox(height: AppSpacing.s),
+
+        // ---------- Adresse ----------
         TextFormField(
           initialValue: options.adresse,
           onChanged: actions.saisirAdresse,
@@ -173,23 +197,8 @@ class _ChoixAdresse extends StatelessWidget {
             labelText: 'Adresse ou point de repère',
             hintText: 'Ex. : Angré 8e tranche, derrière la pharmacie',
             prefixIcon: const Icon(Icons.home),
-            // Message rouge seulement après un essai de validation.
-            errorText: afficherErreur ? options.erreur : null,
+            errorText: erreurAdresse ? 'Indiquez votre adresse ou un point de repère.' : null,
           ),
-        ),
-        const SizedBox(height: AppSpacing.m),
-        _OptionZone(
-          titre: 'Même commune ($communeEtal)',
-          prix: TarifsLivraison.memeCommune,
-          choisi: options.memeCommune,
-          onTap: () => actions.choisirZone(memeCommune: true),
-        ),
-        const SizedBox(height: AppSpacing.s),
-        _OptionZone(
-          titre: 'Autre commune',
-          prix: TarifsLivraison.autreCommune,
-          choisi: !options.memeCommune,
-          onTap: () => actions.choisirZone(memeCommune: false),
         ),
         const SizedBox(height: AppSpacing.s),
         Row(

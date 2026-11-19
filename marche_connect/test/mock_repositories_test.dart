@@ -9,6 +9,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:marche_connect/data/mock/mock_data.dart';
 import 'package:marche_connect/data/mock/mock_repositories.dart';
 import 'package:marche_connect/data/models/models.dart';
+import 'package:marche_connect/data/repositories/auth_repository.dart';
 
 void main() {
   late MockDatabase db;
@@ -26,20 +27,41 @@ void main() {
     commandes = MockCommandeRepository(db, latence: Duration.zero);
   });
 
-  group('Connexion', () {
+  group('Connexion et inscription', () {
     test('Bon code OTP : on récupère le compte de Mariam (commerçante)', () async {
-      final u = await auth.verifierCode('0505050505', codeOtpDemo);
-      expect(u?.role, Role.commercant);
-      expect(u?.etalId, 'e-1');
+      final resultat = await auth.verifierCode('0505050505', codeOtpDemo);
+      expect(resultat, isA<CompteExistant>());
+      final u = (resultat as CompteExistant).utilisateur;
+      expect(u.role, Role.commercant);
+      expect(u.etalId, 'e-1');
     });
 
     test('Mauvais code OTP : connexion refusée', () async {
-      expect(await auth.verifierCode('0505050505', '000000'), isNull);
+      expect(await auth.verifierCode('0505050505', '000000'), isA<CodeIncorrect>());
     });
 
-    test('Nouveau numéro : inscription automatique comme client', () async {
-      final u = await auth.verifierCode('0799999999', codeOtpDemo);
-      expect(u?.role, Role.client);
+    test('Nouveau numéro : il faut créer le compte', () async {
+      expect(await auth.verifierCode('0799999999', codeOtpDemo), isA<NouveauCompte>());
+    });
+
+    test('Inscription comme livreur', () async {
+      final u = await auth.inscrire(
+        telephone: '0799999999',
+        nom: 'Ibrahim Koné',
+        role: Role.livreur,
+        commune: Commune.abobo,
+      );
+      expect(u.role, Role.livreur);
+      expect(db.utilisateurs.last.nom, 'Ibrahim Koné');
+      // Ensuite, le même numéro est reconnu comme compte existant.
+      expect(await auth.verifierCode('0799999999', codeOtpDemo), isA<CompteExistant>());
+    });
+
+    test("On ne peut pas s'inscrire soi-même comme commerçant ou admin", () async {
+      expect(
+        () => auth.inscrire(telephone: '0799999999', nom: 'X', role: Role.admin),
+        throwsArgumentError,
+      );
     });
   });
 

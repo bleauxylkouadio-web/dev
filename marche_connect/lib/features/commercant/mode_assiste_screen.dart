@@ -17,6 +17,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/router/routes.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_theme.dart';
 import '../../core/theme/app_sizes.dart';
 import '../../core/utils/formatters.dart';
 import '../../core/utils/validators.dart';
@@ -112,10 +113,7 @@ class _ModeAssisteScreenState extends ConsumerState<ModeAssisteScreen> {
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.m),
           child: FilledButton(
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.accent,
-              foregroundColor: AppColors.surAccent,
-            ),
+            style: AppTheme.boutonOrange,
             onPressed: _enCours ? null : () => _valider(produits),
             child: _enCours
                 ? const SizedBox.square(dimension: 24, child: CircularProgressIndicator(strokeWidth: 3))

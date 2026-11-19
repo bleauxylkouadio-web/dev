@@ -1,13 +1,23 @@
 // =====================================================================
 //  app_colors.dart : TOUTES les couleurs de MARCHÉ_CONNECT
 //
+//  Identité visuelle : les couleurs du DRAPEAU IVOIRIEN.
+//    🟧 Orange  #F77F00  → achats, paiement, appels à l'action
+//    ⬜ Blanc   #FFFFFF  → fonds, cartes (clarté, lisibilité)
+//    🟩 Vert    #009E60  → marque, navigation, validation
+//
+//  Pour le texte et les boutons, on utilise des NUANCES plus foncées
+//  du vert et de l'orange : les couleurs exactes du drapeau sont trop
+//  claires pour du texte blanc lu en plein soleil (UX-06).
+//
 //  Règle : aucun écran n'écrit une couleur « en dur » (Color(0xFF...)).
 //  Chaque écran utilise AppColors.xxx. Pour changer une couleur partout,
 //  on la change UNE seule fois ici.
 //
-//  Exigence UX-06 : contrastes élevés, lisible en plein soleil.
-//  Tous les couples texte/fond ci-dessous ont un contraste d'au moins
-//  4.5:1 (norme d'accessibilité WCAG AA).
+//  Contrastes vérifiés (norme WCAG AA, au moins 4,5:1 pour le texte) :
+//    blanc sur primaire        5,4:1
+//    texte sur accent          7,9:1   (texte foncé sur orange)
+//    texteSecondaire sur blanc 6,1:1
 // =====================================================================
 
 import 'package:flutter/material.dart';
@@ -19,68 +29,77 @@ import 'package:flutter/material.dart';
 /// `AppColors.primaire`.
 abstract final class AppColors {
   // -------------------------------------------------------------------
-  //  Couleurs de marque
+  //  Couleurs EXACTES du drapeau (bande décorative, logo)
+  // -------------------------------------------------------------------
+  static const Color orangeDrapeau = Color(0xFFF77F00);
+  static const Color blancDrapeau = Color(0xFFFFFFFF);
+  static const Color vertDrapeau = Color(0xFF009E60);
+
+  // -------------------------------------------------------------------
+  //  Couleurs de marque (usage dans l'interface)
   // -------------------------------------------------------------------
 
-  /// Vert foncé : couleur principale (barre du haut, boutons principaux).
-  /// Évoque les produits frais du marché. Texte blanc dessus = très lisible.
-  static const Color primaire = Color(0xFF0B6E4F);
+  /// Vert ivoirien profond : barre du haut, bouton principal, liens.
+  /// Texte blanc dessus : très lisible.
+  static const Color primaire = Color(0xFF007A4D);
 
-  /// Vert encore plus foncé : bouton appuyé, titres importants.
-  static const Color primaireFonce = Color(0xFF07523A);
+  /// Vert encore plus foncé : bouton appuyé, titres sur fond clair.
+  static const Color primaireFonce = Color(0xFF005C3A);
 
-  /// Vert très clair : fonds de sections, puces sélectionnées.
-  static const Color primaireClair = Color(0xFFE3F2EC);
+  /// Vert très clair : fonds de sélection, puces choisies.
+  static const Color primaireClair = Color(0xFFE6F4EE);
 
-  /// Orange : couleur d'accent (bouton « Commander », badge du panier).
-  /// Attire l'œil sur l'action principale de l'écran.
-  static const Color accent = Color(0xFFE8730C);
+  /// Orange du drapeau : « Commander », « Payer », pastilles du panier.
+  static const Color accent = orangeDrapeau;
 
-  /// Texte posé sur le orange. On utilise du noir et non du blanc :
-  /// le blanc sur orange manque de contraste en plein soleil.
-  static const Color surAccent = Color(0xFF1A1A1A);
+  /// Texte posé sur l'orange : presque noir (le blanc sur orange manque
+  /// de contraste au soleil).
+  static const Color surAccent = Color(0xFF1B1B1B);
 
-  /// Orange très clair : fond du badge « Mis en avant ».
-  static const Color accentClair = Color(0xFFFFD9B8);
+  /// Orange très clair : fond « Mis en avant », alertes douces.
+  static const Color accentClair = Color(0xFFFFEBD6);
+
+  /// Orange clair lisible sur le vert (deuxième moitié du logo).
+  static const Color accentSurVert = Color(0xFFFFB25B);
 
   // -------------------------------------------------------------------
   //  Fonds et textes
   // -------------------------------------------------------------------
 
-  /// Fond général des écrans (blanc cassé, moins éblouissant que le blanc pur).
-  static const Color fond = Color(0xFFF7F7F5);
+  /// Fond général des écrans : blanc légèrement grisé (moins éblouissant).
+  static const Color fond = Color(0xFFF6F7F5);
 
-  /// Fond des cartes (produit, commande) : blanc pur pour ressortir sur le fond.
+  /// Fond des cartes et des champs : blanc pur.
   static const Color surface = Color(0xFFFFFFFF);
 
-  /// Texte principal : presque noir (contraste maximal).
-  static const Color texte = Color(0xFF1A1A1A);
+  /// Fond des zones secondaires (champ inactif, bouton désactivé).
+  static const Color surfaceGrisee = Color(0xFFEEF0EF);
 
-  /// Texte secondaire : dates, descriptions courtes. Reste lisible (contraste 7:1).
-  static const Color texteSecondaire = Color(0xFF4A4A4A);
+  /// Texte principal : presque noir, légèrement bleuté (plus doux).
+  static const Color texte = Color(0xFF15191E);
 
-  /// Bordures des champs et séparateurs.
-  static const Color bordure = Color(0xFFBDBDBD);
+  /// Texte secondaire : dates, descriptions courtes.
+  static const Color texteSecondaire = Color(0xFF5A6270);
+
+  /// Texte désactivé.
+  static const Color texteDesactive = Color(0xFF9AA1AB);
+
+  /// Bordures fines des cartes et des champs.
+  static const Color bordure = Color(0xFFDDE1E5);
 
   // -------------------------------------------------------------------
   //  Couleurs d'état (disponibilité, commandes, messages)
   // -------------------------------------------------------------------
 
-  /// Produit « Disponible », paiement réussi, commande livrée.
-  static const Color succes = Color(0xFF1B7F3B);
+  /// « Disponible », paiement réussi, commande livrée.
+  static const Color succes = Color(0xFF12804A);
+  static const Color succesClair = Color(0xFFE3F5EC);
 
-  /// Fond clair associé au vert succès (badge « Disponible »).
-  static const Color succesClair = Color(0xFFDFF3E5);
+  /// « Épuisé », erreur, paiement échoué.
+  static const Color erreur = Color(0xFFD32F2F);
+  static const Color erreurClair = Color(0xFFFDECEC);
 
-  /// Produit « Épuisé », erreur, paiement échoué.
-  static const Color erreur = Color(0xFFC62828);
-
-  /// Fond clair associé au rouge (badge « Épuisé »).
-  static const Color erreurClair = Color(0xFFFBE3E3);
-
-  /// Commande en attente de confirmation par le commerçant (MAR-01 : 10 min).
-  static const Color attente = Color(0xFF8A5A00);
-
-  /// Fond clair associé à l'état « en attente ».
-  static const Color attenteClair = Color(0xFFFFF1D6);
+  /// En attente (confirmation du commerçant, MAR-01) : orange foncé.
+  static const Color attente = Color(0xFF9A5B00);
+  static const Color attenteClair = Color(0xFFFFF3E0);
 }

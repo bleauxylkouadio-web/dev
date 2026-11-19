@@ -13,6 +13,8 @@
 //  le code à 6 chiffres sert de secours si le QR est abîmé.
 // =====================================================================
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -26,17 +28,54 @@ import '../../core/widgets/widgets.dart';
 import '../../data/models/models.dart';
 import '../panier/widgets/recapitulatif.dart';
 import 'commande_providers.dart';
+import 'widgets/carte_livreur.dart';
 import 'widgets/signaler_probleme.dart';
 import 'widgets/suivi_commande.dart';
 
-class TicketScreen extends ConsumerWidget {
+class TicketScreen extends ConsumerStatefulWidget {
   const TicketScreen({super.key, required this.commandeId});
 
   /// Identifiant lu dans l'adresse /ticket/:id.
   final String commandeId;
 
+  /// Fréquence de mise à jour automatique du ticket et de la carte.
+  static const actualisation = Duration(seconds: 10);
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<TicketScreen> createState() => _TicketScreenState();
+}
+
+class _TicketScreenState extends ConsumerState<TicketScreen> {
+  Timer? _minuteur;
+
+  String get commandeId => widget.commandeId;
+
+  @override
+  void initState() {
+    super.initState();
+    // Toutes les 10 s, tant que la commande n'est pas terminée :
+    //  - on recharge le statut → le client voit « En route » dès que le
+    //    livreur a récupéré le colis, SANS toucher l'écran ;
+    //  - pendant la livraison, on recharge aussi la position du livreur.
+    // (Avec la vraie API, une connexion WebSocket remplacera ce minuteur.)
+    _minuteur = Timer.periodic(TicketScreen.actualisation, (_) {
+      final c = ref.read(commandeProvider(commandeId)).value;
+      if (c == null || c.statut.estTerminee) return;
+      ref.invalidate(commandeProvider(commandeId));
+      if (c.statut == StatutCommande.enLivraison) {
+        ref.invalidate(positionLivreurProvider(commandeId));
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _minuteur?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final commande = ref.watch(commandeProvider(commandeId));
 
     return Scaffold(
@@ -105,6 +144,14 @@ class _ContenuTicket extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(AppSpacing.m),
       children: [
+        // =============== SUIVI DU LIVREUR EN DIRECT ===============
+        // Dès que le livreur a le colis (« En livraison ») et jusqu'à la
+        // remise : c'est l'information la plus attendue, on la met en haut.
+        if (c.statut == StatutCommande.enLivraison) ...[
+          CarteLivreur(commande: c),
+          const SizedBox(height: AppSpacing.m),
+        ],
+
         // =============== LE TICKET ===============
         Card(
           child: Padding(

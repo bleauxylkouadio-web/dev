@@ -47,10 +47,18 @@ String? calculerRedirection(Utilisateur? utilisateur, Uri uri) {
       ).toString();
 
   // ---- Règle 4 : déjà connecté sur /connexion ----
+  // (cas juste après une connexion ou une inscription)
   if (chemin == Routes.connexion) {
     if (!connecte) return null;
+    final role = utilisateur.role;
+    final accueil = accueilDuRole(role);
     final retour = uri.queryParameters['retour'];
-    return retour ?? accueilDuRole(utilisateur.role);
+    // On revient à la page demandée avant la connexion SEULEMENT si elle
+    // concerne ce profil. Ex. : un livreur qui s'inscrit en partant du
+    // panier va sur SON interface (/livreur), pas sur le paiement client.
+    final retourAdapte = retour != null &&
+        (role == Role.client || role == Role.admin || _sousLe(Uri.parse(retour).path, accueil));
+    return retourAdapte ? retour : accueil;
   }
 
   // ---- Règle 2 : pages réservées aux personnes connectées ----

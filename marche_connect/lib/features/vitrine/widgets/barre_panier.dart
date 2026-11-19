@@ -15,6 +15,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/router/routes.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/app_sizes.dart';
 import '../../../core/utils/formatters.dart';
 import '../../panier/panier_provider.dart';
@@ -33,10 +34,7 @@ class BarrePanier extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.m),
         child: FilledButton(
-          style: FilledButton.styleFrom(
-            backgroundColor: AppColors.accent,
-            foregroundColor: AppColors.surAccent,
-          ),
+          style: AppTheme.boutonOrange,
           onPressed: () => context.push(Routes.panier),
           // Sur un petit téléphone (360 px), le texte doit tenir sur une
           // ligne : le nombre de produits va dans une pastille sur l'icône,

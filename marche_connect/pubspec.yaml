@@ -67,6 +67,14 @@ dependencies:
   # plus tard WhatsApp et itinéraire (ACH-01).
   url_launcher: ^6.3.3
 
+  # SUIVI DU LIVREUR EN DIRECT :
+  # - geolocator : lit la position GPS du téléphone du livreur ;
+  # - flutter_map : affiche la carte (fonds OpenStreetMap, sans clé d'API) ;
+  # - latlong2 : le type « latitude / longitude » utilisé par la carte.
+  geolocator: ^14.1.2
+  flutter_map: ^8.3.2
+  latlong2: ^0.10.1
+
 # ---------------------------------------------------------------------
 #  Dépendances de développement (non incluses dans l'app finale)
 # ---------------------------------------------------------------------

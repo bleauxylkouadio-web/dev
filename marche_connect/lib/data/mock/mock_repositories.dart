@@ -37,20 +37,38 @@ class MockAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<Utilisateur?> verifierCode(String telephone, String code) async {
+  Future<ResultatCode> verifierCode(String telephone, String code) async {
     await _db.reseau(latence);
-    if (code != codeOtpDemo) return null; // mauvais code
+    if (code != codeOtpDemo) return const CodeIncorrect();
 
     // Compte existant ? On le renvoie.
     for (final u in _db.utilisateurs) {
-      if (u.telephone == telephone) return u;
+      if (u.telephone == telephone) return CompteExistant(u);
     }
-    // Nouveau numéro : inscription automatique comme client.
+    // Numéro inconnu : l'écran va proposer de créer le compte.
+    return const NouveauCompte();
+  }
+
+  @override
+  Future<Utilisateur> inscrire({
+    required String telephone,
+    required String nom,
+    required Role role,
+    Commune? commune,
+  }) async {
+    await _db.reseau(latence);
+    if (!rolesInscriptionLibre.contains(role)) {
+      throw ArgumentError('Le rôle ${role.libelle} ne peut pas être choisi à l\'inscription.');
+    }
+    if (_db.utilisateurs.any((u) => u.telephone == telephone)) {
+      throw StateError('Ce numéro a déjà un compte.');
+    }
     final nouveau = Utilisateur(
       id: 'u-${_db.utilisateurs.length + 1}',
       telephone: telephone,
-      nom: 'Nouveau client',
-      role: Role.client,
+      nom: nom.trim(),
+      role: role,
+      commune: commune,
     );
     _db.utilisateurs.add(nouveau);
     return nouveau;
@@ -213,6 +231,7 @@ class MockCommandeRepository implements CommandeRepository {
     String? clientId,
     int fraisLivraison = 0,
     String? adresseLivraison,
+    Commune? communeLivraison,
     DateTime? heureRetrait,
     bool saisieAssistee = false,
   }) async {
@@ -234,6 +253,7 @@ class MockCommandeRepository implements CommandeRepository {
       modeLivraison: modeLivraison,
       fraisLivraison: modeLivraison == ModeLivraison.retrait ? 0 : fraisLivraison,
       adresseLivraison: adresseLivraison,
+      communeLivraison: modeLivraison == ModeLivraison.livraison ? communeLivraison : null,
       heureRetrait: heureRetrait,
       moyenPaiement: moyenPaiement,
       // Simulation : un paiement Mobile Money réussit toujours en démo.
@@ -277,7 +297,41 @@ class MockCommandeRepository implements CommandeRepository {
     await _db.reseau(latence);
     return _plusRecentesDabord(_db.commandes.where((c) =>
         c.livreurId == livreurId &&
-        (c.statut == StatutCommande.prete || c.statut == StatutCommande.enLivraison)));
+        // « Confirmée » : acceptée par le livreur, encore en préparation à l'étal.
+        (c.statut == StatutCommande.confirmee ||
+            c.statut == StatutCommande.prete ||
+            c.statut == StatutCommande.enLivraison)));
+  }
+
+  /// Une commande peut-elle être prise par un livreur ?
+  static bool _disponible(Commande c) =>
+      c.modeLivraison == ModeLivraison.livraison &&
+      c.livreurId == null &&
+      (c.statut == StatutCommande.confirmee || c.statut == StatutCommande.prete);
+
+  @override
+  Future<List<Commande>> commandesDisponibles(Commune commune) async {
+    await _db.reseau(latence);
+    final liste = _db.commandes.where((c) => _disponible(c) && c.communeLivraison == commune).toList()
+      // Les prêtes d'abord (à récupérer tout de suite), puis les plus anciennes.
+      ..sort((a, b) {
+        if ((a.statut == StatutCommande.prete) != (b.statut == StatutCommande.prete)) {
+          return a.statut == StatutCommande.prete ? -1 : 1;
+        }
+        return a.creeLe.compareTo(b.creeLe);
+      });
+    return liste;
+  }
+
+  @override
+  Future<Commande?> accepterLivraison(String commandeId, String livreurId) async {
+    await _db.reseau(latence);
+    final index = _db.commandes.indexWhere((c) => c.id == commandeId);
+    // Déjà prise par un autre livreur (ou plus disponible) : refusé.
+    if (index == -1 || !_disponible(_db.commandes[index])) return null;
+    final acceptee = _db.commandes[index].copyWith(livreurId: livreurId);
+    _db.commandes[index] = acceptee;
+    return acceptee;
   }
 
   @override
@@ -292,6 +346,9 @@ class MockCommandeRepository implements CommandeRepository {
       confirmeeLe: statut == StatutCommande.confirmee ? DateTime.now() : null,
     );
     _db.commandes[index] = modifiee;
+    // Fin de livraison (livrée ou annulée) : on efface la position du
+    // livreur, elle ne doit plus être visible (vie privée).
+    if (statut.estTerminee) _db.positions.remove(commandeId);
     return modifiee;
   }
 
@@ -322,6 +379,7 @@ class MockCommandeRepository implements CommandeRepository {
       statutPaiement: StatutPaiement.paye,
     );
     _db.commandes[index] = livree;
+    _db.positions.remove(livree.id); // fin du partage de position
     return livree;
   }
 

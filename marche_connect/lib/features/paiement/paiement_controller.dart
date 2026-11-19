@@ -60,6 +60,7 @@ class PaiementController extends Notifier<PaiementState> {
             fraisLivraison: options.frais,
             adresseLivraison:
                 options.mode == ModeLivraison.livraison ? options.adresse.trim() : null,
+            communeLivraison: options.commune,
             heureRetrait: options.mode == ModeLivraison.retrait
                 ? options.heureRetrait(DateTime.now())
                 : null,

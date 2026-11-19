@@ -112,6 +112,7 @@ class Commande {
     this.clientId,
     this.fraisLivraison = 0,
     this.adresseLivraison,
+    this.communeLivraison,
     this.heureRetrait,
     this.statut = StatutCommande.enAttente,
     this.statutPaiement = StatutPaiement.enAttente,
@@ -149,6 +150,10 @@ class Commande {
 
   /// Adresse ou point de repère (« Derrière la pharmacie… »), si livraison.
   final String? adresseLivraison;
+
+  /// Commune où livrer (si livraison). Sert à regrouper les livraisons
+  /// d'une même commune pour un livreur (tournées).
+  final Commune? communeLivraison;
 
   /// MAR-02 : heure à laquelle le client passe chercher sa commande.
   final DateTime? heureRetrait;
@@ -215,6 +220,7 @@ class Commande {
       modeLivraison: modeLivraison,
       fraisLivraison: fraisLivraison,
       adresseLivraison: adresseLivraison,
+      communeLivraison: communeLivraison,
       heureRetrait: heureRetrait,
       moyenPaiement: moyenPaiement,
       statut: statut ?? this.statut,
@@ -245,6 +251,9 @@ class Commande {
       modeLivraison: ModeLivraison.values.byName(json['modeLivraison'] as String),
       fraisLivraison: json['fraisLivraison'] as int? ?? 0,
       adresseLivraison: json['adresseLivraison'] as String?,
+      communeLivraison: json['communeLivraison'] == null
+          ? null
+          : Commune.values.byName(json['communeLivraison'] as String),
       heureRetrait: lireDate('heureRetrait'),
       moyenPaiement: MoyenPaiement.values.byName(json['moyenPaiement'] as String),
       statut: StatutCommande.values.byName(json['statut'] as String),
@@ -268,6 +277,7 @@ class Commande {
         'modeLivraison': modeLivraison.name,
         'fraisLivraison': fraisLivraison,
         'adresseLivraison': adresseLivraison,
+        'communeLivraison': communeLivraison?.name,
         'heureRetrait': heureRetrait?.toIso8601String(),
         'moyenPaiement': moyenPaiement.name,
         'statut': statut.name,

@@ -19,10 +19,12 @@ import '../../core/router/routes.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_sizes.dart';
 import '../../core/utils/formatters.dart';
+import '../../core/widgets/identite.dart';
 import '../../data/mock/mock_data.dart';
 import '../../data/repositories/providers.dart';
 import 'connexion_controller.dart';
 import 'widgets/etape_code.dart';
+import 'widgets/etape_inscription.dart';
 import 'widgets/etape_telephone.dart';
 
 /// ConsumerStatefulWidget : comme StatefulWidget, avec accès à `ref`.
@@ -66,14 +68,16 @@ class _ConnexionScreenState extends ConsumerState<ConnexionScreen> {
               padding: const EdgeInsets.all(AppSpacing.l),
               children: [
                 // ---------- En-tête ----------
-                const Icon(Icons.storefront, size: 64, color: AppColors.primaire),
-                const SizedBox(height: AppSpacing.s),
-                Text('MARCHÉ_CONNECT', style: textes.headlineSmall, textAlign: TextAlign.center),
+                // Logo de la marque (pictogramme + « MarchéConnect »).
+                const Center(child: LogoMarcheConnect(taille: 52)),
                 const SizedBox(height: AppSpacing.xs),
                 Text(
-                  etat.etape == EtapeConnexion.telephone
-                      ? 'Entrez votre numéro.\nPas de mot de passe : un code par SMS suffit.'
-                      : 'Entrez le code à 6 chiffres reçu par SMS.',
+                  switch (etat.etape) {
+                    EtapeConnexion.telephone =>
+                      'Entrez votre numéro.\nPas de mot de passe : un code par SMS suffit.',
+                    EtapeConnexion.code => 'Entrez le code à 6 chiffres reçu par SMS.',
+                    EtapeConnexion.inscription => 'Bienvenue ! Créons votre compte.',
+                  },
                   style: textes.bodyMedium?.copyWith(color: AppColors.texteSecondaire),
                   textAlign: TextAlign.center,
                 ),
@@ -85,25 +89,32 @@ class _ConnexionScreenState extends ConsumerState<ConnexionScreen> {
                   const SizedBox(height: AppSpacing.m),
                 ],
 
-                // ---------- Étape 1 ou 2 ----------
-                // AnimatedSwitcher : fondu enchaîné entre les deux étapes.
+                // ---------- Étape 1, 2 ou 3 ----------
+                // AnimatedSwitcher : fondu enchaîné entre les étapes.
                 AnimatedSwitcher(
                   duration: const Duration(milliseconds: 250),
-                  child: etat.etape == EtapeConnexion.telephone
-                      ? EtapeTelephone(
-                          key: _cleTelephone,
-                          enCours: etat.enCours,
-                          numeroInitial: etat.telephone,
-                          onValider: controleur.envoyerCode,
-                        )
-                      : EtapeCode(
-                          key: const ValueKey('etape-code'),
-                          telephone: etat.telephone,
-                          enCours: etat.enCours,
-                          onValider: controleur.verifierCode,
-                          onRenvoyer: controleur.renvoyerCode,
-                          onModifierNumero: controleur.modifierNumero,
-                        ),
+                  child: switch (etat.etape) {
+                    EtapeConnexion.telephone => EtapeTelephone(
+                        key: _cleTelephone,
+                        enCours: etat.enCours,
+                        numeroInitial: etat.telephone,
+                        onValider: controleur.envoyerCode,
+                      ),
+                    EtapeConnexion.code => EtapeCode(
+                        key: const ValueKey('etape-code'),
+                        telephone: etat.telephone,
+                        enCours: etat.enCours,
+                        onValider: controleur.verifierCode,
+                        onRenvoyer: controleur.renvoyerCode,
+                        onModifierNumero: controleur.modifierNumero,
+                      ),
+                    EtapeConnexion.inscription => EtapeInscription(
+                        key: const ValueKey('etape-inscription'),
+                        telephone: etat.telephone,
+                        enCours: etat.enCours,
+                        onValider: controleur.inscrire,
+                      ),
+                  },
                 ),
 
                 // ---------- Comptes de démo (développement uniquement) ----------

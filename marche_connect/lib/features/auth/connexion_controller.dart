@@ -16,11 +16,14 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/utils/formatters.dart';
+import '../../data/models/models.dart';
+import '../../data/repositories/auth_repository.dart';
 import '../../data/repositories/providers.dart';
 import 'session_provider.dart';
 
-/// Les deux étapes de l'écran.
-enum EtapeConnexion { telephone, code }
+/// Les étapes de l'écran :
+///   telephone → code → (nouveau numéro seulement) inscription
+enum EtapeConnexion { telephone, code, inscription }
 
 /// L'ÉTAT de l'écran à un instant donné. Immuable : chaque changement
 /// crée un nouvel état avec copyWith.
@@ -95,27 +98,58 @@ class ConnexionController extends Notifier<ConnexionState> {
     }
   }
 
-  /// Étape 2 : vérifie le code. Renvoie vrai si la connexion a réussi.
+  /// Étape 2 : vérifie le code. Renvoie vrai si la personne est connectée
+  /// (compte existant). Pour un nouveau numéro, passe à l'étape inscription.
   Future<bool> verifierCode(String code) async {
     state = state.copyWith(enCours: true, effacerErreur: true);
     try {
-      final utilisateur = await ref
+      final resultat = await ref
           .read(authRepositoryProvider)
           .verifierCode(state.telephone, code.trim());
 
-      if (utilisateur == null) {
-        state = state.copyWith(enCours: false, erreur: 'Code incorrect. Réessayez.');
-        return false;
+      // `switch` sur une classe `sealed` : les 3 cas sont obligatoires.
+      switch (resultat) {
+        case CodeIncorrect():
+          state = state.copyWith(enCours: false, erreur: 'Code incorrect. Réessayez.');
+          return false;
+        case NouveauCompte():
+          // Numéro inconnu : on demande nom et profil (client ou livreur).
+          state = state.copyWith(enCours: false, etape: EtapeConnexion.inscription);
+          return false;
+        case CompteExistant(:final utilisateur):
+          // ✔ Connecté : on remplit la session. Le routeur est prévenu et
+          // emmène l'utilisateur vers son interface (règle 4 de redirection.dart).
+          ref.read(sessionProvider.notifier).connecter(utilisateur);
+          state = state.copyWith(enCours: false);
+          return true;
       }
-      // ✔ Connecté : on remplit la session. Le routeur est prévenu et
-      // emmène l'utilisateur vers son accueil (ou la page demandée).
+    } catch (_) {
+      state = state.copyWith(
+        enCours: false,
+        erreur: 'Vérification impossible. Vérifiez votre connexion.',
+      );
+      return false;
+    }
+  }
+
+  /// Étape 3 (nouveau numéro) : crée le compte puis connecte la personne.
+  /// Un LIVREUR arrive alors directement sur son interface (/livreur).
+  Future<bool> inscrire({required String nom, required Role role, Commune? commune}) async {
+    state = state.copyWith(enCours: true, effacerErreur: true);
+    try {
+      final utilisateur = await ref.read(authRepositoryProvider).inscrire(
+            telephone: state.telephone,
+            nom: nom,
+            role: role,
+            commune: commune,
+          );
       ref.read(sessionProvider.notifier).connecter(utilisateur);
       state = state.copyWith(enCours: false);
       return true;
     } catch (_) {
       state = state.copyWith(
         enCours: false,
-        erreur: 'Vérification impossible. Vérifiez votre connexion.',
+        erreur: "Le compte n'a pas pu être créé. Vérifiez votre connexion.",
       );
       return false;
     }

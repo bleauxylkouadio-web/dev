@@ -19,12 +19,14 @@ import '../local/stockage_local.dart';
 import '../mock/mock_admin_repositories.dart';
 import '../mock/mock_data.dart';
 import '../mock/mock_repositories.dart';
+import '../mock/mock_suivi_repository.dart';
 import 'admin_repository.dart';
 import 'auth_repository.dart';
 import 'commande_repository.dart';
 import 'etal_repository.dart';
 import 'litige_repository.dart';
 import 'produit_repository.dart';
+import 'suivi_repository.dart';
 
 /// La base de démo, partagée par tous les repositories (une seule instance,
 /// sinon une commande créée ne serait pas vue par l'espace commerçant).
@@ -78,6 +80,11 @@ final produitRepositoryProvider = Provider<ProduitRepository>(
 
 final commandeRepositoryProvider = Provider<CommandeRepository>(
   (ref) => MockCommandeRepository(ref.watch(mockDatabaseProvider)),
+);
+
+/// Suivi du livreur en direct (position pendant la livraison).
+final suiviRepositoryProvider = Provider<SuiviRepository>(
+  (ref) => MockSuiviRepository(ref.watch(mockDatabaseProvider)),
 );
 
 final litigeRepositoryProvider = Provider<LitigeRepository>(

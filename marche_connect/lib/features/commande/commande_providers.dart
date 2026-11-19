@@ -13,6 +13,12 @@ final commandeProvider = FutureProvider.autoDispose.family<Commande?, String>((r
   return ref.watch(commandeRepositoryProvider).trouverCommande(id);
 });
 
+/// Dernière position du livreur pour une commande en livraison.
+/// L'écran du ticket la redemande toutes les 10 s (voir ticket_screen.dart).
+final positionLivreurProvider = FutureProvider.autoDispose.family<PositionLivreur?, String>((ref, commandeId) {
+  return ref.watch(suiviRepositoryProvider).positionDuLivreur(commandeId);
+});
+
 /// Le litige d'une commande, s'il y en a un (ACH-04).
 final litigeDeCommandeProvider = FutureProvider.autoDispose.family<Litige?, String>((ref, commandeId) {
   return ref.watch(litigeRepositoryProvider).litigeDeLaCommande(commandeId);

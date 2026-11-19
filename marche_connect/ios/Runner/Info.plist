@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Pendant une livraison, votre position est montrée au client pour qu'il sache où en est sa commande.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>La caméra sert à scanner les QR codes des étals et des tickets de commande.</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>

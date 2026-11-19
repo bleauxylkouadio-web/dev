@@ -7,17 +7,23 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+// Riverpod 3 range le type « Override » dans misc.dart.
+import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:marche_connect/data/mock/mock_admin_repositories.dart';
 import 'package:marche_connect/data/mock/mock_data.dart';
 import 'package:marche_connect/data/mock/mock_repositories.dart';
+import 'package:marche_connect/data/mock/mock_suivi_repository.dart';
 import 'package:marche_connect/data/repositories/providers.dart';
 import 'package:marche_connect/main.dart';
 
-ProviderContainer conteneurDeTest() {
+/// `autres` : remplacements supplémentaires propres à un test
+/// (ex. une fausse source GPS).
+ProviderContainer conteneurDeTest({List<Override> autres = const []}) {
   final db = MockDatabase();
   final container = ProviderContainer(overrides: [
+    ...autres,
     mockDatabaseProvider.overrideWithValue(db),
     authRepositoryProvider.overrideWithValue(MockAuthRepository(db, latence: Duration.zero)),
     // On remplace la partie « réseau » : le cache hors ligne reste actif.
@@ -26,6 +32,7 @@ ProviderContainer conteneurDeTest() {
     commandeRepositoryProvider.overrideWithValue(MockCommandeRepository(db, latence: Duration.zero)),
     litigeRepositoryProvider.overrideWithValue(MockLitigeRepository(db, latence: Duration.zero)),
     adminRepositoryProvider.overrideWithValue(MockAdminRepository(db, latence: Duration.zero)),
+    suiviRepositoryProvider.overrideWithValue(MockSuiviRepository(db, latence: Duration.zero)),
   ]);
   addTearDown(container.dispose);
   return container;

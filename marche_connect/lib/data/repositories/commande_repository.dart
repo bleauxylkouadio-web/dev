@@ -18,6 +18,7 @@ abstract interface class CommandeRepository {
     String? clientId,
     int fraisLivraison = 0,
     String? adresseLivraison,
+    Commune? communeLivraison,
     DateTime? heureRetrait,
     bool saisieAssistee = false,
   });
@@ -37,6 +38,16 @@ abstract interface class CommandeRepository {
 
   /// Commandes « Prête » ou « En livraison » d'un livreur.
   Future<List<Commande>> missionsDuLivreur(String livreurId);
+
+  /// Commandes DISPONIBLES à livrer dans une commune : prêtes (ou
+  /// confirmées, en préparation), à livrer, et sans livreur.
+  /// Un livreur qui a déjà une course dans cette commune peut ainsi en
+  /// prendre d'autres sur le même trajet (tournée).
+  Future<List<Commande>> commandesDisponibles(Commune commune);
+
+  /// Le livreur prend une commande disponible. Renvoie la commande
+  /// (avec livreurId rempli), ou null si un autre livreur l'a prise avant.
+  Future<Commande?> accepterLivraison(String commandeId, String livreurId);
 
   /// Fait avancer une commande : confirmer, prête, en livraison, annuler…
   Future<Commande> changerStatut(String commandeId, StatutCommande statut);

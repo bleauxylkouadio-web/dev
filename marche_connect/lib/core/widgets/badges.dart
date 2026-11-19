@@ -37,7 +37,8 @@ class Etiquette extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: fond,
-        borderRadius: BorderRadius.circular(AppRadius.petit),
+        // Forme « pilule » : plus moderne que des coins carrés.
+        borderRadius: BorderRadius.circular(AppRadius.pilule),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min, // juste la largeur du contenu

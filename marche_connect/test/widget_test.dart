@@ -4,6 +4,7 @@
 
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:marche_connect/core/widgets/identite.dart';
 import 'package:marche_connect/core/router/app_router.dart';
 import 'package:marche_connect/core/router/routes.dart';
 
@@ -14,7 +15,7 @@ void main() {
     final c = conteneurDeTest();
     await lancerApp(tester, c);
 
-    expect(find.text('MARCHÉ_CONNECT'), findsOneWidget);
+    expect(find.byType(LogoMarcheConnect), findsOneWidget); // logo de la barre
     expect(find.text('Se connecter'), findsOneWidget);
     expect(find.text('5 étals'), findsOneWidget);
   });

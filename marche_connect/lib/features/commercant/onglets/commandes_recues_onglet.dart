@@ -20,6 +20,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/router/routes.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/app_sizes.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../core/widgets/widgets.dart';
@@ -201,7 +202,7 @@ class _CarteCommandeRecueState extends ConsumerState<_CarteCommandeRecue> {
         actions: [
           TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Non')),
           FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: AppColors.erreur),
+            style: AppTheme.boutonDanger,
             onPressed: () => Navigator.pop(context, true),
             child: const Text('Refuser'),
           ),

@@ -30,7 +30,12 @@ void main() {
     expect(livraison.frais, 500);
     expect(livraison.copyWith(memeCommune: false).frais, 1000);
     expect(livraison.erreur, isNotNull); // adresse manquante
-    expect(livraison.copyWith(adresse: 'Angré 8e tranche').erreur, isNull);
+    // La commune de livraison est aussi obligatoire (tournées des livreurs).
+    expect(livraison.copyWith(adresse: 'Angré 8e tranche').erreur, 'Choisissez la commune de livraison.');
+    expect(
+      livraison.copyWith(adresse: 'Angré 8e tranche', commune: Commune.cocody).erreur,
+      isNull,
+    );
   });
 
   testWidgets('Panier : + et − (pas de 0,5 kg), livraison sans adresse refusée', (tester) async {

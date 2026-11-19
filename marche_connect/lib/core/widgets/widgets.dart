@@ -10,4 +10,5 @@ export 'carte_commande.dart';
 export 'carte_etal.dart';
 export 'carte_produit.dart';
 export 'etats.dart';
+export 'identite.dart';
 export 'photo_produit.dart';

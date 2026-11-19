@@ -39,7 +39,8 @@ class ListeEtalsScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('MARCHÉ_CONNECT'),
+        // Logo de la marque dans la barre verte.
+        title: const LogoMarcheConnect(surFondVert: true),
         actions: [
           // Développement uniquement : simuler une coupure réseau.
           if (kDebugMode) const _BoutonCoupureReseau(),

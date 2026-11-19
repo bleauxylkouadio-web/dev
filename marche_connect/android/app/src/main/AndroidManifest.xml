@@ -1,6 +1,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- MARCHÉ_CONNECT : caméra pour scanner les QR (livreur). -->
     <uses-permission android:name="android.permission.CAMERA" />
+    <!-- MARCHÉ_CONNECT : position du livreur, partagée avec le client
+         pendant la livraison uniquement. -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <!-- Nécessaire pour lire les tuiles de la carte (OpenStreetMap). -->
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:label="MARCHÉ_CONNECT"
